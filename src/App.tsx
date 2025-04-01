@@ -53,6 +53,12 @@ const adjust = (rate: number | undefined) => {
 	return NaN;
 };
 
+const catchRateCalc = (rate: number | undefined) => {
+	if (typeof rate == "number") {
+		rate = rate / 1.12;
+	}
+};
+
 function App() {
 	const [pkmn, setPkmn] = useState<APIResult>({
 		id: 133, 
