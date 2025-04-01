@@ -3,39 +3,15 @@ import axios from "axios";
 
 import "./App.scss";
 
+const dashOrUnderscore = new RegExp("([_-])+");
 
 import type {
-	PokeAPIObject,
 	APIResult,
-	PkmnId,
+	PkmnId
 } from "./types";
 
 import { BoostType } from "./enums";
 
-/**
- * Returns a stripped down PokeAPI object.
- * @param pokemon {PkmnId} If a string, fetches using the Pokemon's name, if a number, fetches by it's National Pokedex number.
- * @returns {APIResult}
- */
-const pokemonFetch = (
-	pokemon: PkmnId = Math.floor(Math.random() * 1025 + 1)
-): APIResult => {
-	let apiFindings: APIResult = null;
-	axios
-		.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
-		.then((res) => {
-			apiFindings = {
-				id: res.data.id,
-				name: res.data.name,
-				sprite_default: res.data.sprites["front_default"],
-				sprite_shiny: res.data.sprites["front_shiny"],
-			} as PokeAPIObject;
-		})
-		.catch(() => {
-			console.log("Could not find Pokemon!");
-		});
-	return apiFindings;
-};
 
 const getShinyOdds = (
 	boost?: BoostType,
@@ -60,17 +36,54 @@ const getShinyOdds = (
 	return isShiny;
 };
 
+const caps = (text: string): string => {
+	let modifiedText: string = text;
+	if (dashOrUnderscore.test(text)) {
+		modifiedText = text.replace(dashOrUnderscore, " ");
+	}
+	modifiedText = modifiedText.charAt(0).toUpperCase() + modifiedText.slice(1);
+	return modifiedText;
+};
+
 function App() {
-	const [pkmn, setPkmn] = useState<APIResult>(pokemonFetch("eevee"));
+	const [pkmn, setPkmn] = useState<APIResult>({
+		id: 133, 
+		name: "eevee",
+		catch_rate: 45,
+		sprite_default: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+		sprite_shiny: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/133.png"
+});
 	const [shinyOdds, setShinyOdds] = useState<boolean>(getShinyOdds());
 
+	const pokemonFetch = async(
+	pokemon: PkmnId = Math.floor(Math.random() * 1025 + 1)
+) => {
+	const pokemonObj = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
+	const speciesObj = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemon}`);
+
+	const p = pokemonObj.data;
+	const s = speciesObj.data;
+
+	if (p && s) {
+		setPkmn({
+		id: p.id,
+		name: p.name,
+		catch_rate: s.capture_rate,
+		sprite_default: p.sprites["front_default"],
+		sprite_shiny: p.sprites["front_shiny"]
+	});
+	}
+	// alert("Pokemon not found!");
+};
+
 	const changePokemon = (pokemon: PkmnId = Math.floor(Math.random() * 1025 + 1)) => {
-		setPkmn(pokemonFetch(pokemon));
+		pokemonFetch(pokemon);
 		setShinyOdds(getShinyOdds());
 	};
 
 	return (
 		<>
+		<h1>{pkmn ? caps(pkmn.name) : "sample text"}</h1>
 			<img src={shinyOdds ? pkmn?.sprite_shiny : pkmn?.sprite_default} alt="" />
 			<button
 				onClick={() => {
