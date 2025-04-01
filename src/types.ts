@@ -9,4 +9,3 @@ export type APIResult = PokeAPIObject | null;
 
 export type PkmnId = number | string;
 
-export type ShinyBoostAmount = number;

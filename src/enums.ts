@@ -1,4 +1,4 @@
-export enum ShinyBoostType {
+export enum BoostType {
 	None,
 	Set,
 	Multiplicative,

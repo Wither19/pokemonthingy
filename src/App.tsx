@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 import "./App.scss";
@@ -9,10 +9,9 @@ import type {
 	PokeAPIObject,
 	APIResult,
 	PkmnId,
-	ShinyBoostAmount,
 } from "./types";
 
-import { ShinyBoostType } from "./enums";
+import { BoostType } from "./enums";
 
 /**
  * Returns a stripped down PokeAPI object.
@@ -20,9 +19,9 @@ import { ShinyBoostType } from "./enums";
  * @returns {APIResult}
  */
 const pokemonFetch = (
-	pokemon: PkmnId = Math.random() * 1025 + 1
+	pokemon: PkmnId = Math.floor(Math.random() * 1025 + 1)
 ): APIResult => {
-	var apiFindings: APIResult = null;
+	let apiFindings: APIResult = null;
 	axios
 		.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)
 		.then((res) => {
@@ -40,22 +39,21 @@ const pokemonFetch = (
 };
 
 const getShinyOdds = (
-	pokemon: string,
-	boost?: ShinyBoostType,
-	boostAmount?: ShinyBoostAmount
+	boost?: BoostType,
+	amount?: number
 ): boolean => {
 	const baseOdds: number = 4096;
 	let finalOdds: number = baseOdds;
 	if (boost) {
-		if (boostAmount) {
+		if (amount) {
 			if (boost == 1) {
-				finalOdds = boostAmount;
+				finalOdds = amount;
 			} else if (boost == 2) {
-				finalOdds /= boostAmount;
+				finalOdds /= amount;
 			}
 		}
 	}
-	let shinyRoll = Math.random() * finalOdds + 1;
+	const shinyRoll = Math.random() * finalOdds + 1;
 	let isShiny: boolean = false;
 	if (shinyRoll == 1) {
 		isShiny = true;
@@ -65,11 +63,12 @@ const getShinyOdds = (
 
 function App() {
 	const [pkmn, setPkmn] = useState<APIResult>(pokemonFetch("eevee"));
-	const [shinyOdds, setShinyOdds] = useState<boolean>(getShinyOdds("eevee"));
+	const [shinyOdds, setShinyOdds] = useState<boolean>(getShinyOdds());
 
-	const changePokemon = (pokemon: PkmnId = Math.random() * 1025 + 1) => {
+	const changePokemon = (pokemon: PkmnId = Math.floor(Math.random() * 1025 + 1)) => {
 		setPkmn(pokemonFetch(pokemon));
-		setShinyOdds(getShinyOdds(pokemon.toString()));
+		setShinyOdds(getShinyOdds());
+		alert(pokemon);
 	};
 
 	return (
@@ -80,7 +79,7 @@ function App() {
 			<button
 				onClick={() => {
 					changePokemon();
-				}}></button>
+				}}>Randomize</button>
 		</>
 	);
 }
