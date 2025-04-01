@@ -3,7 +3,6 @@ import axios from "axios";
 
 import "./App.scss";
 
-import { PokemonSprite } from "./components/PokemonSprite";
 
 import type {
 	PokeAPIObject,
@@ -68,14 +67,11 @@ function App() {
 	const changePokemon = (pokemon: PkmnId = Math.floor(Math.random() * 1025 + 1)) => {
 		setPkmn(pokemonFetch(pokemon));
 		setShinyOdds(getShinyOdds());
-		alert(pokemon);
 	};
 
 	return (
 		<>
-			<PokemonSprite
-				image={shinyOdds ? pkmn?.sprite_shiny : pkmn?.sprite_default}
-			/>
+			<img src={shinyOdds ? pkmn?.sprite_shiny : pkmn?.sprite_default} alt="" />
 			<button
 				onClick={() => {
 					changePokemon();
