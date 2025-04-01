@@ -45,6 +45,14 @@ const caps = (text: string): string => {
 	return modifiedText;
 };
 
+const adjust = (rate: number | undefined) => {
+	if (typeof rate == "number") {
+	rate = rate / 2.55;
+	return Math.round(rate);
+	}
+	return NaN;
+};
+
 function App() {
 	const [pkmn, setPkmn] = useState<APIResult>({
 		id: 133, 
@@ -83,13 +91,16 @@ function App() {
 
 	return (
 		<>
+	<div style={{textAlign: "center"}}>
 		<h1>{pkmn ? caps(pkmn.name) : "sample text"}</h1>
-			<img src={shinyOdds ? pkmn?.sprite_shiny : pkmn?.sprite_default} alt="" />
+		<b>Catch Rate: {adjust(pkmn?.catch_rate)}%</b>
+		<img src={shinyOdds ? pkmn?.sprite_shiny : pkmn?.sprite_default} alt="" />
 			<button
 				onClick={() => {
 					changePokemon();
 				}}>Randomize</button>
-		</>
+	</div>
+		</>			
 	);
 }
 
